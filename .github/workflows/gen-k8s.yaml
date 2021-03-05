@@ -1,0 +1,20 @@
+name: Mani Gen
+on: push
+
+jobs:
+  run:
+    name: Push Update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Update manifests
+        run: ./update-k8s.sh
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v7
+        with:
+          add: 'flux'
+          message: deploy $GITHUB_SHA
+          signoff: true
