@@ -26,5 +26,5 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           add: '.'
-          message: "[ci skip] deploy from ${{VERSION}}"
+          message: "[ci skip] deploy from ${{ steps.prep.outputs.VERSION }}"
           signoff: true
