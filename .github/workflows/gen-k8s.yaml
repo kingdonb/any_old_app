@@ -1,5 +1,8 @@
 name: Mani Gen
-on: push
+on:
+  push:
+    branches:
+    - '*'
 
 jobs:
   run:
