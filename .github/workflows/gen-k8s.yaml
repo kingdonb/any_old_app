@@ -6,6 +6,16 @@ jobs:
     name: Push Update
     runs-on: ubuntu-latest
     steps:
+      - name: Prepare
+        id: prep
+        run: |
+          VERSION=${GITHUB_SHA::8}
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            VERSION=${GITHUB_REF/refs\/tags\//}
+          fi
+          echo ::set-output name=BUILD_DATE::$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          echo ::set-output name=VERSION::${VERSION}
+
       - name: Checkout repo
         uses: actions/checkout@v2
 
@@ -16,5 +26,5 @@ jobs:
         uses: EndBug/add-and-commit@v7
         with:
           add: '.'
-          message: '[ci skip] deploy from latest git commit'
+          message: "[ci skip] deploy from ${{ steps.prep.outputs.VERSION }}"
           signoff: true
