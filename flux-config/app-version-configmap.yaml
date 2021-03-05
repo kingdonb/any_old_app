@@ -1,7 +1,8 @@
 apiVersion: v1
 data:
-  git-sha: ea7c53af
+  GIT_SHA: 1ef94af8
 kind: ConfigMap
 metadata:
   creationTimestamp: null
-  name: app-version
+  name: any-old-app-version
+  namespace: devl

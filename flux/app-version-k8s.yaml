@@ -13,7 +13,7 @@ spec:
         app: any-old-app
     spec:
       containers:
-      - image: kingdonb/any-old-app:1ef94af8
+      - image: kingdonb/any-old-app:${GIT_SHA}
         name: any-old-app
 
 ---

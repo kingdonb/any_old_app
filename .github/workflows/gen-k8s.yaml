@@ -1,4 +1,4 @@
-name: Mani Gen
+name: Manifest Generation
 on:
   push:
     branches:
