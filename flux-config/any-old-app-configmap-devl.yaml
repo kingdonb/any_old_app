@@ -17,8 +17,6 @@ spec:
   targetNamespace: devl
   validation: client
   postBuild:
-    substitute:
-      GIT_SHA: ''
     substituteFrom:
       - kind: ConfigMap
         name: any-old-app-version
