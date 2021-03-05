@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: any-old-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: any-old-app
+  template:
+    metadata:
+      labels:
+        app: any-old-app
+    spec:
+      containers:
+      - image: kingdonb/any-old-app:ruby
+        name: any-old-app
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: any-old-app
+spec:
+  type: ClusterIP
+  ports:
+  - name: "any-old-app"
+    port: 3000
+  selector:
+    app: any-old-app
