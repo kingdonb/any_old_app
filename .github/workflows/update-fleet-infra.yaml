@@ -25,8 +25,9 @@ jobs:
       - name: Update manifests
         run: ./update-k8s.sh $GITHUB_SHA
 
-      - name: Pushes to another repository
-        uses: cpina/github-action-push-to-another-repository@1.2
+      - name: Push directory to another repository
+        uses: cpina/github-action-push-to-another-repository@v1.2
+
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
