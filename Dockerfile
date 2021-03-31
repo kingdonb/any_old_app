@@ -1,10 +1,13 @@
 FROM ruby:2.7.2
 # RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 WORKDIR /any_old_app
-COPY Gemfile /any_old_app/Gemfile
-COPY Gemfile.lock /any_old_app/Gemfile.lock
+RUN useradd -u 1000 -Um rails && \
+    chown -R rails:rails /any_old_app
+USER 1000
+COPY --chown=1000 Gemfile /any_old_app/Gemfile
+COPY --chown=1000 Gemfile.lock /any_old_app/Gemfile.lock
 RUN bundle install
-COPY . /any_old_app
+COPY --chown=1000 . /any_old_app
 
 # Add a script to be executed every time the container starts.
 COPY entrypoint.sh /usr/bin/
