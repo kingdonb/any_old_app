@@ -11,9 +11,11 @@ COPY --chown=1000 . /any_old_app
 
 # Add a script to be executed every time the container starts.
 COPY entrypoint.sh /usr/bin/
+USER root
 RUN chmod +x /usr/bin/entrypoint.sh
 ENTRYPOINT ["entrypoint.sh"]
 EXPOSE 3000
 
+USER rails
 # Start the main process.
 CMD ["rails", "server", "-b", "0.0.0.0"]
