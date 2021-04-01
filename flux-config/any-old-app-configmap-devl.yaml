@@ -10,6 +10,7 @@ spec:
   sourceRef:
     kind: GitRepository
     name: any-old-app-main
+  targetNamespace: yebyen-okd4
   validation: client
   postBuild:
     substituteFrom:
