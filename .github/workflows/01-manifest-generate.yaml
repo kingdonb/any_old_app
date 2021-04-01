@@ -1,3 +1,4 @@
+# 01-manifest-generate.yaml
 name: Manifest Generation
 on:
   push:
