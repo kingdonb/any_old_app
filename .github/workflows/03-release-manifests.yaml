@@ -1,4 +1,4 @@
-# 03-release-manifests.yaml
+# ./.github/workflows/03-release-manifests.yaml
 name: Build jsonnet
 on:
   push:
@@ -27,7 +27,7 @@ jobs:
         uses: alexdglover/jsonnet-render@v1
         with:
           file: manifests/example.jsonnet
-          output_dir: output/
+          output_dir: output/production.yaml
           params: dryrun=true;env=prod
 
       - name: Prepare target branch
@@ -36,7 +36,7 @@ jobs:
       - name: Commit changes
         uses: EndBug/add-and-commit@v7
         with:
-          add: 'output/'
+          add: 'production.yaml'
           branch: deploy
           message: "[ci skip] from ${{ steps.prep.outputs.VERSION }}"
           signoff: true
