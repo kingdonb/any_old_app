@@ -1,0 +1,78 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    note: Hello, I am production!
+  labels:
+    org: acmeCorporation
+    variant: production
+  name: the-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      org: acmeCorporation
+      variant: production
+  template:
+    metadata:
+      annotations:
+        note: Hello, I am production!
+      labels:
+        deployment: hello
+        org: acmeCorporation
+        variant: production
+    spec:
+      containers:
+      - command:
+        - /hello
+        - --port=8080
+        - --enableRiskyFeature=$(ENABLE_RISKY)
+        env:
+        - name: ALT_GREETING
+          valueFrom:
+            configMapKeyRef:
+              key: altGreeting
+              name: the-map
+        - name: ENABLE_RISKY
+          valueFrom:
+            configMapKeyRef:
+              key: enableRisky
+              name: the-map
+        image: monopole/hello:1
+        name: the-container
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    note: Hello, I am production!
+  labels:
+    org: acmeCorporation
+    variant: production
+  name: the-service
+spec:
+  ports:
+  - port: 8666
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    deployment: hello
+    org: acmeCorporation
+    variant: production
+  type: LoadBalancer
+---
+apiVersion: v1
+data:
+  altGreeting: Good Afternoon!
+  enableRisky: "false"
+kind: ConfigMap
+metadata:
+  annotations:
+    note: Hello, I am production!
+  labels:
+    org: acmeCorporation
+    variant: production
+  name: the-map
