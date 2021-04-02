@@ -4,7 +4,7 @@ name: Docker Build, Push
 on:
   push:
     branches:
-      - '**'
+      - '*'
     tags-ignore:
       - 'release/*'
 
