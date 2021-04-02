@@ -9,7 +9,7 @@ spec:
   prune: true
   sourceRef:
     kind: GitRepository
-    name: any-old-app-prod
+    name: any-old-app-deploy
   targetNamespace: test-yebyen
   validation: client
   postBuild:
