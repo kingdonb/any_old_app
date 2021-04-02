@@ -23,12 +23,11 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v2
 
-      - id: jsonnet-render
-        uses: alexdglover/jsonnet-render@v1
-        with:
-          file: manifests/example.jsonnet
-          output_dir: output/production.yaml
-          params: dryrun=true;env=prod
+      - name: Setup kubecfg CLI
+        uses: kingdonb/kubecfg/action@main
+
+      - name: kubecfg show
+        run: kubecfg show manifests/example.jsonnet > output/production.yaml
 
       - name: Prepare target branch
         run: ./ci/rake.sh deploy
