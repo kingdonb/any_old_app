@@ -1,4 +1,4 @@
-# 04-update-fleet-infra.yaml
+# ./.github/workflows/04-update-fleet-infra.yaml
 name: Update Fleet-Infra
 on:
   push:
