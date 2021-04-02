@@ -1,0 +1,13 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: any-old-app-prod
+  namespace: yebyen-okd4
+spec:
+  interval: 20m0s
+  ref:
+    branch: deploy
+  secretRef:
+    name: flux-secret
+  url: ssh://git@github.com/kingdonb/csh-flux

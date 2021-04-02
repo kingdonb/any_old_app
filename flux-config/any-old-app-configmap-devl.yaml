@@ -5,12 +5,12 @@ metadata:
   name: any-old-app-devl
 spec:
   interval: 1m0s
-  path: ./flux
-  prune: false
+  path: ./
+  prune: true
   sourceRef:
     kind: GitRepository
-    name: any-old-app-main
-  targetNamespace: yebyen-okd4
+    name: any-old-app-prod
+  targetNamespace: prod-yebyen
   validation: client
   postBuild:
     substituteFrom:
