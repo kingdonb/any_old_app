@@ -32,7 +32,7 @@ local updateConfig(o) = (
 );
 
 local kustomization = kustomize.applyList([
-//  updateConfig,
+  updateConfig,
 //  kustomize.namePrefix("staging-"),
   kustomize.commonLabels({variant: "production", org: "acmeCorporation"}),
   kustomize.commonAnnotations({note: "Hello, I am production!"}),
