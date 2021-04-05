@@ -55,9 +55,6 @@ local kubecfg = import 'kubecfg.libsonnet';
       ref: {
         branch: 'main',
       },
-      secretRef: {
-        name: 'flux-secret',
-      },
       url: 'ssh://git@github.com/kingdonb/csh-flux',
     },
   },
