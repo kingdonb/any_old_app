@@ -29,7 +29,7 @@ local kubecfg = import 'kubecfg.libsonnet';
     spec: {
       interval: '10m0s',
       path: './',
-      prune: 'false',
+      prune: false,
       sourceRef: {
         kind: 'GitRepository',
         name: 'any-old-app-prod',
