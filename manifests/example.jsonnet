@@ -37,7 +37,7 @@ local example = import 'example.libsonnet';
 
 {
   version_configmap: kube.ConfigMap('any-old-app-version') {
-    stringData+: {
+    data+: {
       VERSION: 'v1.0.0',
     },
   },
