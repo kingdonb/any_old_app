@@ -31,67 +31,38 @@
 
 // This example uses kube.libsonnet from Bitnami.  There are other
 // Kubernetes libraries available, or write your own!
-local kube = import "https://github.com/bitnami-labs/kube-libsonnet/raw/73bf12745b86718083df402e89c6c903edd327d2/kube.libsonnet";
+local kube = import 'https://github.com/bitnami-labs/kube-libsonnet/raw/73bf12745b86718083df402e89c6c903edd327d2/kube.libsonnet';
 
+local example = import 'example.libsonnet';
 
 {
-  frontend_deployment: kube.Deployment("frontend") {
-    spec+: {
-      local my_spec = self,
-      replicas: 3,
-      template+: {
-        spec+: {
-          containers_+: {
-            gb_fe: kube.Container("gb-frontend") {
-              image: "gcr.io/google-samples/gb-frontend:v4",
-              resources: { requests: { cpu: "100m", memory: "100Mi" } },
-              env_+: {
-                GET_HOSTS_FROM: "dns",
-                NUMBER_REPLICAS: my_spec.replicas,
-              },
-              ports_+: { http: { containerPort: 80 } },
-  }}}}}},
-
-  frontend_service: kube.Service("frontend") {
-    target_pod: $.frontend_deployment.spec.template,
-    // spec+: { type: "LoadBalancer" },
+  version_configmap: kube.ConfigMap('any-old-app-version') {
+    data+: {
+      VERSION: 'v1.0.0',
+    },
   },
-
-  redis_master_deployment: kube.Deployment("redis-master") {
+  flux_kustomization: example.kustomization('any-old-app-prod') {
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
     spec+: {
-      template+: {
-        spec+: {
-          containers_+: {
-            redis_master: kube.Container("redis-master") {
-              image: "gcr.io/google_containers/redis:e2e",
-              resources: { requests: { cpu: "100m", memory: "100Mi" } },
-              ports_+: {
-                redis: { containerPort: 6379 },
-  }}}}}}},
-
-  redis_master_service: kube.Service("redis-master") {
-    target_pod: $.redis_master_deployment.spec.template,
+      path: './flux-config/',
+      postBuild+: {
+        substituteFrom+: [
+          {
+            kind: 'ConfigMap',
+            name: 'any-old-app-version',
+          },
+        ],
+      },
+    },
   },
-
-  redis_slave_deployment: kube.Deployment("redis-slave") {
+  flux_gitrepository: example.gitrepository('any-old-app-prod') {
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
     spec+: {
-      replicas: 2,
-      template+: {
-        spec+: {
-          containers_+: {
-            redis_slave: kube.Container("redist-slave") {
-              image: "gcr.io/google_samples/gb-redisslave:v1",
-              resources: {
-                requests: { cpu: "100m", memory: "100Mi" },
-              },
-              env_: {
-                GET_HOSTS_FROM: "dns",
-              },
-              ports_+: {
-                redis: { containerPort: 6379 },
-  }}}}}}},
-
-  redis_slave_service: kube.Service("redis-slave") {
-    target_pod: $.redis_slave_deployment.spec.template,
+      url: 'https://github.com/kingdonb/any_old_app',
+    },
   },
 }
