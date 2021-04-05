@@ -34,7 +34,7 @@ jobs:
         with:
           source-directory: 'flux-config'
           destination-github-username: 'kingdonb'
-          destination-repository-name: 'fleet-infra'
+          destination-repository-name: 'csh-flux'
           target-branch: 'deploy'
           user-email: kingdon+bot@weave.works
           commit-message: "[ci skip] deploy from ${{ steps.prep.outputs.VERSION }}"

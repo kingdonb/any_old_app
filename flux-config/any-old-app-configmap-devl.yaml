@@ -4,7 +4,7 @@ kind: Kustomization
 metadata:
   name: any-old-app-devl
 spec:
-  interval: 1m0s
+  interval: 15m0s
   path: ./
   prune: true
   sourceRef:
