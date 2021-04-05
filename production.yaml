@@ -1,15 +1,4 @@
 ---
-apiVersion: v1
-data: {}
-kind: ConfigMap
-metadata:
-  annotations: {}
-  labels:
-    name: any-old-app-version
-  name: any-old-app-version
-stringData:
-  VERSION: v1.0.0
----
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
@@ -44,3 +33,13 @@ spec:
     kind: GitRepository
     name: any-old-app-prod
   validation: client
+---
+apiVersion: v1
+data:
+  VERSION: v1.0.0
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
