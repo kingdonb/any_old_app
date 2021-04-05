@@ -21,7 +21,7 @@ spec:
     secretRef:
       name: sops-gpg
   interval: 10m0s
-  path: ./
+  path: ./flux-config/
   postBuild:
     substituteFrom:
     - kind: ConfigMap
