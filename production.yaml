@@ -28,7 +28,7 @@ spec:
     substituteFrom:
     - kind: ConfigMap
       name: any-old-app-version
-  prune: "false"
+  prune: false
   sourceRef:
     kind: GitRepository
     name: any-old-app-prod
