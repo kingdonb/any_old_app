@@ -1,192 +1,46 @@
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations: {}
-  labels:
-    name: redis-master
-  name: redis-master
-spec:
-  minReadySeconds: 30
-  replicas: 1
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      name: redis-master
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations: {}
-      labels:
-        name: redis-master
-    spec:
-      containers:
-      - args: []
-        env: []
-        image: gcr.io/google_containers/redis:e2e
-        imagePullPolicy: IfNotPresent
-        name: redis-master
-        ports:
-        - containerPort: 6379
-          name: redis
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        stdin: false
-        tty: false
-        volumeMounts: []
-      imagePullSecrets: []
-      initContainers: []
-      terminationGracePeriodSeconds: 30
-      volumes: []
----
 apiVersion: v1
-kind: Service
+data: {}
+kind: ConfigMap
 metadata:
   annotations: {}
   labels:
-    name: redis-master
-  name: redis-master
-spec:
-  ports:
-  - name: redis
-    port: 6379
-    targetPort: 6379
-  selector:
-    name: redis-master
-  type: ClusterIP
+    name: any-old-app-version
+  name: any-old-app-version
+stringData:
+  VERSION: v1.0.0
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
 metadata:
-  annotations: {}
-  labels:
-    name: redis-slave
-  name: redis-slave
+  name: any-old-app-prod
+namespace: yebyen-okd4
 spec:
-  minReadySeconds: 30
-  replicas: 2
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      name: redis-slave
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations: {}
-      labels:
-        name: redis-slave
-    spec:
-      containers:
-      - args: []
-        env:
-        - name: GET_HOSTS_FROM
-          value: dns
-        image: gcr.io/google_samples/gb-redisslave:v1
-        imagePullPolicy: IfNotPresent
-        name: redist-slave
-        ports:
-        - containerPort: 6379
-          name: redis
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        stdin: false
-        tty: false
-        volumeMounts: []
-      imagePullSecrets: []
-      initContainers: []
-      terminationGracePeriodSeconds: 30
-      volumes: []
+  interval: 20m0s
+  ref:
+    branch: main
+  secretRef:
+    name: flux-secret
+  url: https://github.com/kingdonb/any_old_app
 ---
-apiVersion: v1
-kind: Service
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
 metadata:
-  annotations: {}
-  labels:
-    name: redis-slave
-  name: redis-slave
+  name: any-old-app-prod
+namespace: yebyen-okd4
 spec:
-  ports:
-  - name: redis
-    port: 6379
-    targetPort: 6379
-  selector:
-    name: redis-slave
-  type: ClusterIP
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations: {}
-  labels:
-    name: frontend
-  name: frontend
-spec:
-  minReadySeconds: 30
-  replicas: 3
-  revisionHistoryLimit: 10
-  selector:
-    matchLabels:
-      name: frontend
-  strategy:
-    rollingUpdate:
-      maxSurge: 25%
-      maxUnavailable: 25%
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations: {}
-      labels:
-        name: frontend
-    spec:
-      containers:
-      - args: []
-        env:
-        - name: GET_HOSTS_FROM
-          value: dns
-        - name: NUMBER_REPLICAS
-          value: "3"
-        image: gcr.io/google-samples/gb-frontend:v4
-        imagePullPolicy: IfNotPresent
-        name: gb-frontend
-        ports:
-        - containerPort: 80
-          name: http
-        resources:
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        stdin: false
-        tty: false
-        volumeMounts: []
-      imagePullSecrets: []
-      initContainers: []
-      terminationGracePeriodSeconds: 30
-      volumes: []
----
-apiVersion: v1
-kind: Service
-metadata:
-  annotations: {}
-  labels:
-    name: frontend
-  name: frontend
-spec:
-  ports:
-  - name: http
-    port: 80
-    targetPort: 80
-  selector:
-    name: frontend
-  type: ClusterIP
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
+  interval: 10m0s
+  path: ./
+  postBuild:
+    substituteFrom:
+    - kind: ConfigMap
+      name: any-old-app-version
+  prune: "false"
+  sourceRef:
+    kind: GitRepository
+    name: any-old-app-prod
+  validation: client
