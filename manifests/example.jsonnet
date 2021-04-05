@@ -46,6 +46,7 @@ local example = import 'example.libsonnet';
       namespace: 'yebyen-okd4',
     },
     spec+: {
+      path: './flux-config/',
       postBuild+: {
         substituteFrom+: [
           {

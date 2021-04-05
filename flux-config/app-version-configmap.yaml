@@ -4,4 +4,4 @@ data:
 kind: ConfigMap
 metadata:
   creationTimestamp: null
-  name: any-old-app-version
+  name: any-old-app-latest-version
