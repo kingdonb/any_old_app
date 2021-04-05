@@ -41,3 +41,4 @@ metadata:
   labels:
     name: any-old-app-version
   name: any-old-app-version
+  namespace: prod-yebyen
