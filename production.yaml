@@ -1,5 +1,5 @@
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations: {}
@@ -9,6 +9,7 @@ metadata:
 spec:
   minReadySeconds: 30
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       name: redis-master
@@ -25,16 +26,13 @@ spec:
     spec:
       containers:
       - args: []
-        env:
-        - name: ALLOW_EMPTY_PASSWORD
-          value: "yes"
-        - name: REDIS_REPLICATION_MODE
-          value: master
-        image: bitnami/redis:4.0.9
+        env: []
+        image: gcr.io/google_containers/redis:e2e
         imagePullPolicy: IfNotPresent
-        name: redis
+        name: redis-master
         ports:
         - containerPort: 6379
+          name: redis
         resources:
           requests:
             cpu: 100m
@@ -56,13 +54,14 @@ metadata:
   name: redis-master
 spec:
   ports:
-  - port: 6379
+  - name: redis
+    port: 6379
     targetPort: 6379
   selector:
     name: redis-master
   type: ClusterIP
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations: {}
@@ -72,6 +71,7 @@ metadata:
 spec:
   minReadySeconds: 30
   replicas: 2
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       name: redis-slave
@@ -89,19 +89,14 @@ spec:
       containers:
       - args: []
         env:
-        - name: ALLOW_EMPTY_PASSWORD
-          value: "yes"
-        - name: REDIS_MASTER_HOST
-          value: redis-master
-        - name: REDIS_MASTER_PORT_NUMBER
-          value: "6379"
-        - name: REDIS_REPLICATION_MODE
-          value: slave
-        image: bitnami/redis:4.0.9
+        - name: GET_HOSTS_FROM
+          value: dns
+        image: gcr.io/google_samples/gb-redisslave:v1
         imagePullPolicy: IfNotPresent
-        name: redis
+        name: redist-slave
         ports:
         - containerPort: 6379
+          name: redis
         resources:
           requests:
             cpu: 100m
@@ -123,13 +118,14 @@ metadata:
   name: redis-slave
 spec:
   ports:
-  - port: 6379
+  - name: redis
+    port: 6379
     targetPort: 6379
   selector:
     name: redis-slave
   type: ClusterIP
 ---
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations: {}
@@ -139,6 +135,7 @@ metadata:
 spec:
   minReadySeconds: 30
   replicas: 3
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       name: frontend
@@ -155,21 +152,17 @@ spec:
     spec:
       containers:
       - args: []
-        env: []
-        image: gcr.io/google-samples/gb-frontend:v3
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        - name: NUMBER_REPLICAS
+          value: "3"
+        image: gcr.io/google-samples/gb-frontend:v4
         imagePullPolicy: IfNotPresent
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 80
-          initialDelaySeconds: 10
-        name: php-redis
+        name: gb-frontend
         ports:
         - containerPort: 80
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 80
+          name: http
         resources:
           requests:
             cpu: 100m
@@ -191,8 +184,9 @@ metadata:
   name: frontend
 spec:
   ports:
-  - port: 80
+  - name: http
+    port: 80
     targetPort: 80
   selector:
     name: frontend
-  type: LoadBalancer
+  type: ClusterIP
