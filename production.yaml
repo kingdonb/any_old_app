@@ -34,7 +34,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  VERSION: v0.10.0-beta4
+  VERSION: 0.10.0-beta4
 kind: ConfigMap
 metadata:
   annotations: {}
