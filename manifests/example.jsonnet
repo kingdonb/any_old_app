@@ -42,7 +42,9 @@ local example = import 'example.libsonnet';
     },
   },
   flux_kustomization: example.kustomization('any-old-app-prod') {
-    namespace: 'yebyen-okd4',
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
     spec+: {
       postBuild+: {
         substituteFrom+: [
@@ -55,7 +57,9 @@ local example = import 'example.libsonnet';
     },
   },
   flux_gitrepository: example.gitrepository('any-old-app-prod') {
-    namespace: 'yebyen-okd4',
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
     spec+: {
       url: 'https://github.com/kingdonb/any_old_app',
     },
