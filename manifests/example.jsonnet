@@ -13,14 +13,19 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// Simple example to demonstrate kubecfg.
+// Simple to demonstrate kubecfg using kube-libsonnet
+// This should not necessarily be considered a model jsonnet example
+// to build upon.
 
 // This is a simple port to jsonnet of the standard guestbook example
 // https://github.com/kubernetes/kubernetes/tree/master/examples/guestbook
 //
 // ```
 // kubecfg update guestbook.jsonnet
-// # poke at $(minikube service --url frontend), etc
+//
+// # poke at
+// - $(minikube service frontend), etc
+// - kubectl proxy # then visit http://localhost:8001/api/v1/namespaces/default/services/frontend/proxy/
 // kubecfg delete guestbook.jsonnet
 // ```
 
@@ -28,95 +33,65 @@
 // Kubernetes libraries available, or write your own!
 local kube = import "https://github.com/bitnami-labs/kube-libsonnet/raw/73bf12745b86718083df402e89c6c903edd327d2/kube.libsonnet";
 
-// A function that returns 2 k8s objects: a redis Deployment and Service
-local redis(name) = {
-  svc: kube.Service(name) {
-    // "$" is an alias for the result value from the current function/file
-    target_pod:: $.deploy.spec.template,
+
+{
+  frontend_deployment: kube.Deployment("frontend") {
+    spec+: {
+      local my_spec = self,
+      replicas: 3,
+      template+: {
+        spec+: {
+          containers_+: {
+            gb_fe: kube.Container("gb-frontend") {
+              image: "gcr.io/google-samples/gb-frontend:v4",
+              resources: { requests: { cpu: "100m", memory: "100Mi" } },
+              env_+: {
+                GET_HOSTS_FROM: "dns",
+                NUMBER_REPLICAS: my_spec.replicas,
+              },
+              ports_+: { http: { containerPort: 80 } },
+  }}}}}},
+
+  frontend_service: kube.Service("frontend") {
+    target_pod: $.frontend_deployment.spec.template,
+    // spec+: { type: "LoadBalancer" },
   },
 
-  deploy: kube.Deployment(name) {
+  redis_master_deployment: kube.Deployment("redis-master") {
     spec+: {
       template+: {
         spec+: {
-          containers_: {
-            redis: kube.Container("redis") {
-              image: "bitnami/redis:4.0.9",
-              resources: {requests: {cpu: "100m", memory: "100Mi"}},
-              ports: [{containerPort: 6379}],
+          containers_+: {
+            redis_master: kube.Container("redis-master") {
+              image: "gcr.io/google_containers/redis:e2e",
+              resources: { requests: { cpu: "100m", memory: "100Mi" } },
+              ports_+: {
+                redis: { containerPort: 6379 },
+  }}}}}}},
 
-              // kube.libsonnet has a few optional "underscore"
-              // helpers to convert k8s API structures into more
-              // natural jsonnet structures.  See kube.libsonnet.
+  redis_master_service: kube.Service("redis-master") {
+    target_pod: $.redis_master_deployment.spec.template,
+  },
+
+  redis_slave_deployment: kube.Deployment("redis-slave") {
+    spec+: {
+      replicas: 2,
+      template+: {
+        spec+: {
+          containers_+: {
+            redis_slave: kube.Container("redist-slave") {
+              image: "gcr.io/google_samples/gb-redisslave:v1",
+              resources: {
+                requests: { cpu: "100m", memory: "100Mi" },
+              },
               env_: {
-                REDIS_REPLICATION_MODE: "master",
-                ALLOW_EMPTY_PASSWORD: "yes",
+                GET_HOSTS_FROM: "dns",
               },
-            },
-          },
-        },
-      },
-    },
-  },
-};
+              ports_+: {
+                redis: { containerPort: 6379 },
+  }}}}}}},
 
-// Note the jsonnet file evaluates to the last object in the file.
-// Kubecfg expects this object to be a possibly nested collection
-// (array or object) of Kubernetes API objects.
-{
-  frontend: {
-    svc: kube.Service("frontend") {
-      target_pod: $.frontend.deploy.spec.template,
-      spec+: {type: "LoadBalancer"},
-    },
-
-    deploy: kube.Deployment("frontend") {
-      spec+: {
-        replicas: 3,
-        template+: {
-          spec+: {
-            containers_+: {
-              frontend: kube.Container("php-redis") {
-                image: "gcr.io/google-samples/gb-frontend:v3",
-                resources: {
-                  requests: {cpu: "100m", memory: "100Mi"},
-                },
-                ports: [{containerPort: 80}],
-                readinessProbe: {
-                  httpGet: {path: "/", port: 80},
-                },
-                livenessProbe: self.readinessProbe {
-                  initialDelaySeconds: 10,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-
-  master: redis("redis-master"),
-
-  // "Override" some parameters in the slave redis Deployment.
-  slave: redis("redis-slave") {
-    deploy+: {
-      spec+: {
-        replicas: 2,
-        template+: {
-          spec+: {
-            containers_+: {
-              redis+: {
-                env_+: {
-                  REDIS_REPLICATION_MODE: "slave",
-                  REDIS_MASTER_HOST: $.master.svc.metadata.name,
-                  REDIS_MASTER_PORT_NUMBER: "6379",
-                },
-              },
-            },
-          },
-        },
-      },
-    },
+  redis_slave_service: kube.Service("redis-slave") {
+    target_pod: $.redis_slave_deployment.spec.template,
   },
 }
