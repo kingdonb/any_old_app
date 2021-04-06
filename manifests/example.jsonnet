@@ -37,8 +37,11 @@ local example = import 'example.libsonnet';
 
 {
   version_configmap: kube.ConfigMap('any-old-app-version') {
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
     data+: {
-      VERSION: 'v1.0.0',
+      VERSION: std.extVar('VERSION'),
     },
   },
   flux_kustomization: example.kustomization('any-old-app-prod') {
