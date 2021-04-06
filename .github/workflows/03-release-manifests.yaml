@@ -27,7 +27,7 @@ jobs:
         uses: kingdonb/kubecfg/action@main
 
       - name: kubecfg show
-        run: kubecfg show manifests/example.jsonnet > output/production.yaml
+        run: ./ci/kubecfg.sh VERSION=${VERSION}
 
       - name: Prepare target branch
         run: ./ci/rake.sh deploy

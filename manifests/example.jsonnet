@@ -41,7 +41,7 @@ local example = import 'example.libsonnet';
       namespace: 'yebyen-okd4',
     },
     data+: {
-      VERSION: '0.10.1-beta4',
+      VERSION: std.extVar('VERSION'),
     },
   },
   flux_kustomization: example.kustomization('any-old-app-prod') {
