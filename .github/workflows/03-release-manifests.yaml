@@ -27,7 +27,7 @@ jobs:
         uses: kingdonb/kubecfg/action@main
 
       - name: kubecfg show
-        run: ./ci/kubecfg.sh VERSION=${VERSION}
+        run: "./ci/kubecfg.sh VERSION=${{ steps.prep.outputs.VERSION }}"
 
       - name: Prepare target branch
         run: ./ci/rake.sh deploy
