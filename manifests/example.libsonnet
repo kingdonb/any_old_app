@@ -57,8 +57,8 @@ local kubecfg = import 'kubecfg.libsonnet';
             name: 'any-old-app-version',
           },
         ],
-        targetNamespace: environment + '-yebyen',
       },
+      targetNamespace: environment + '-yebyen',
     },
   },
 
