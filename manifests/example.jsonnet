@@ -28,20 +28,30 @@ local kube = import 'https://github.com/bitnami-labs/kube-libsonnet/raw/73bf1274
 // more detail at the neighbor libsonnet file here:
 local example = import 'example.libsonnet';
 
+local config_ns = 'yebyen-okd4';
+
 {
   version_configmap: kube.ConfigMap('any-old-app-version') {
     metadata+: {
-      namespace: 'yebyen-okd4',
+      namespace: config_ns,
     },
     data+: {
       VERSION: std.extVar('VERSION'),
     },
   },
-  test_flux_kustomization: example.any_old_app('test'),
-  prod_flux_kustomization: example.any_old_app('prod'),
+  test_flux_kustomization: example.any_old_app('test') {
+    spec+: {
+      prune: true,
+    },
+  },
+  prod_flux_kustomization: example.any_old_app('prod') {
+    spec+: {
+      prune: false,
+    },
+  },
   flux_gitrepository: example.gitrepository('any-old-app-prod') {
     metadata+: {
-      namespace: 'yebyen-okd4',
+      namespace: config_ns,
     },
     spec+: {
       url: 'https://github.com/kingdonb/any_old_app',
