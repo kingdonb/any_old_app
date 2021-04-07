@@ -1,4 +1,15 @@
 ---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: any-old-app-prod
+  namespace: yebyen-okd4
+spec:
+  interval: 20m0s
+  ref:
+    branch: main
+  url: https://github.com/kingdonb/any_old_app
+---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
 metadata:
@@ -38,7 +49,7 @@ spec:
     substituteFrom:
     - kind: ConfigMap
       name: any-old-app-version
-  prune: false
+  prune: true
   sourceRef:
     kind: GitRepository
     name: any-old-app-prod
@@ -47,7 +58,7 @@ spec:
 ---
 apiVersion: v1
 data:
-  VERSION: 0.10.2-alpha3
+  VERSION: 0.10.2-alpha4
 kind: ConfigMap
 metadata:
   annotations: {}
@@ -55,14 +66,3 @@ metadata:
     name: any-old-app-version
   name: any-old-app-version
   namespace: yebyen-okd4
----
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: any-old-app-prod
-  namespace: yebyen-okd4
-spec:
-  interval: 20m0s
-  ref:
-    branch: main
-  url: https://github.com/kingdonb/any_old_app
