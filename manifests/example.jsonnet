@@ -37,7 +37,7 @@ local example = import 'example.libsonnet';
       VERSION: std.extVar('VERSION'),
     },
   },
-  flux_kustomization: example.kustomization('any-old-app-prod') {
+  test_flux_kustomization: example.kustomization('any-old-app-test') {
     metadata+: {
       namespace: 'yebyen-okd4',
     },
@@ -51,6 +51,24 @@ local example = import 'example.libsonnet';
           },
         ],
       },
+      targetNamespace: 'test-yebyen',
+    },
+  },
+  prod_flux_kustomization: example.kustomization('any-old-app-prod') {
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
+    spec+: {
+      path: './flux-config/',
+      postBuild+: {
+        substituteFrom+: [
+          {
+            kind: 'ConfigMap',
+            name: 'any-old-app-version',
+          },
+        ],
+      },
+      targetNamespace: 'prod-yebyen',
     },
   },
   flux_gitrepository: example.gitrepository('any-old-app-prod') {
