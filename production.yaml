@@ -19,11 +19,35 @@ spec:
   sourceRef:
     kind: GitRepository
     name: any-old-app-prod
+  targetNamespace: prod-yebyen
+  validation: client
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
+kind: Kustomization
+metadata:
+  name: any-old-app-test
+  namespace: yebyen-okd4
+spec:
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
+  interval: 10m0s
+  path: ./flux-config/
+  postBuild:
+    substituteFrom:
+    - kind: ConfigMap
+      name: any-old-app-version
+  prune: false
+  sourceRef:
+    kind: GitRepository
+    name: any-old-app-prod
+  targetNamespace: test-yebyen
   validation: client
 ---
 apiVersion: v1
 data:
-  VERSION: 0.10.1
+  VERSION: 0.10.2-alpha1
 kind: ConfigMap
 metadata:
   annotations: {}
