@@ -15,11 +15,11 @@ spec:
     substituteFrom:
     - kind: ConfigMap
       name: any-old-app-version
-    targetNamespace: prod-yebyen
   prune: false
   sourceRef:
     kind: GitRepository
     name: any-old-app-prod
+  targetNamespace: prod-yebyen
   validation: client
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
@@ -38,16 +38,16 @@ spec:
     substituteFrom:
     - kind: ConfigMap
       name: any-old-app-version
-    targetNamespace: test-yebyen
   prune: false
   sourceRef:
     kind: GitRepository
     name: any-old-app-prod
+  targetNamespace: test-yebyen
   validation: client
 ---
 apiVersion: v1
 data:
-  VERSION: 0.10.2-alpha2
+  VERSION: 0.10.2-alpha3
 kind: ConfigMap
 metadata:
   annotations: {}
