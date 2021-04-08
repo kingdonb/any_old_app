@@ -1,4 +1,15 @@
 ---
+apiVersion: v1
+data:
+  VERSION: 0.10.2-alpha6
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: yebyen-okd4
+---
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
@@ -9,6 +20,15 @@ spec:
   ref:
     branch: main
   url: https://github.com/kingdonb/any_old_app
+---
+apiVersion: v1
+data:
+  dataDecryptionSecret: sops-gpg
+  imagePullSecret: docker-pull-secret
+kind: ConfigMap
+metadata:
+  name: flux-config
+  namespace: yebyen-okd4
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
@@ -55,14 +75,3 @@ spec:
     name: any-old-app-prod
   targetNamespace: test-yebyen
   validation: client
----
-apiVersion: v1
-data:
-  VERSION: 0.10.2-alpha5
-kind: ConfigMap
-metadata:
-  annotations: {}
-  labels:
-    name: any-old-app-version
-  name: any-old-app-version
-  namespace: yebyen-okd4
