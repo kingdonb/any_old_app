@@ -27,29 +27,34 @@ local kube = import 'https://github.com/bitnami-labs/kube-libsonnet/raw/73bf1274
 // The declaration below adds configuration to a more verbose base, defined in
 // more detail at the neighbor libsonnet file here:
 local example = import 'example.libsonnet';
+local kubecfg = import 'kubecfg.libsonnet';
+local kustomize = import 'kustomize.libsonnet';
 
 local config_ns = 'yebyen-okd4';
 
-{
-  version_configmap: kube.ConfigMap('any-old-app-version') {
-    metadata+: {
-      namespace: config_ns,
-    },
+local flux_config = [
+  kube.ConfigMap('any-old-app-version') {
     data+: {
       VERSION: std.extVar('VERSION'),
     },
   },
-
-  flux_gitrepository: example.gitrepository('any-old-app-prod') {
-    metadata+: {
-      namespace: config_ns,
-    },
+  example.gitrepository('any-old-app-prod') {
     spec+: {
       url: 'https://github.com/kingdonb/any_old_app',
     },
   },
-} + {
+] + kubecfg.parseYaml(importstr 'examples/configMap.yaml');
+
+local kustomization = kustomize.applyList([
+  kustomize.namespace(config_ns),
+]);
+
+local kustomization_output = std.map(kustomization, flux_config);
+
+{ flux_config: kustomization_output } + {
+
   local items = ['test', 'prod'],
+
   joined: {
     [ns + '_flux_kustomization']: {
       data: example.any_old_app(ns) {

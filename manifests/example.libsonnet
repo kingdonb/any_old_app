@@ -1,4 +1,4 @@
-// Copyright 2017 The kubecfg authors
+// Copyright 2021 The FluxCD project, 2017 kubecfg authors
 //
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
