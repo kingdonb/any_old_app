@@ -39,16 +39,7 @@ local config_ns = 'yebyen-okd4';
       VERSION: std.extVar('VERSION'),
     },
   },
-  test_flux_kustomization: example.any_old_app('test') {
-    spec+: {
-      prune: true,
-    },
-  },
-  prod_flux_kustomization: example.any_old_app('prod') {
-    spec+: {
-      prune: false,
-    },
-  },
+
   flux_gitrepository: example.gitrepository('any-old-app-prod') {
     metadata+: {
       namespace: config_ns,
@@ -56,5 +47,21 @@ local config_ns = 'yebyen-okd4';
     spec+: {
       url: 'https://github.com/kingdonb/any_old_app',
     },
+  },
+} + {
+  local items = ['test', 'prod'],
+  joined: {
+    [ns + '_flux_kustomization']: {
+      data: example.any_old_app(ns) {
+        spec+: {
+          prune: if ns == 'prod' then false else true,
+        },
+      },
+    }
+    for ns in items
+
+    // Credit:
+    // https://groups.google.com/g/jsonnet/c/ky6sjYj4UZ0/m/d4lZxWbhAAAJ
+    // thanks Dave for showing how to do something like this in Jsonnet
   },
 }
