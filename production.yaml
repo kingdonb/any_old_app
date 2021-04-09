@@ -1,7 +1,7 @@
 ---
 apiVersion: v1
 data:
-  VERSION: 0.10.2-alpha6
+  VERSION: 0.10.2
 kind: ConfigMap
 metadata:
   annotations: {}
