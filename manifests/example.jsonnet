@@ -1,4 +1,4 @@
-// Copyright 2017 The kubecfg authors
+// Copyright 2021 The FluxCD project, 2017 kubecfg authors
 //
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,59 +13,60 @@
 //    See the License for the specific language governing permissions and
 //    limitations under the License.
 
-// Simple to demonstrate kubecfg using kube-libsonnet
-// This should not necessarily be considered a model jsonnet example
-// to build upon.
+// Simple kubecfg example interpretation based on bitnami-labs/kube-libsonnet
+// This interpretation should not be considered a model jsonnet example to
+// build upon.
 
-// This is a simple port to jsonnet of the standard guestbook example
-// https://github.com/kubernetes/kubernetes/tree/master/examples/guestbook
-//
-// ```
-// kubecfg update guestbook.jsonnet
-//
-// # poke at
-// - $(minikube service frontend), etc
-// - kubectl proxy # then visit http://localhost:8001/api/v1/namespaces/default/services/frontend/proxy/
-// kubecfg delete guestbook.jsonnet
-// ```
+// This is a simple manifest generation example to demo some simple tasks that
+// can be automated through Flux, with Flux configs rehydrated through Jsonnet.
 
 // This example uses kube.libsonnet from Bitnami.  There are other
 // Kubernetes libraries available, or write your own!
 local kube = import 'https://github.com/bitnami-labs/kube-libsonnet/raw/73bf12745b86718083df402e89c6c903edd327d2/kube.libsonnet';
 
+// The declaration below adds configuration to a more verbose base, defined in
+// more detail at the neighbor libsonnet file here:
 local example = import 'example.libsonnet';
+local kubecfg = import 'kubecfg.libsonnet';
+local kustomize = import 'kustomize.libsonnet';
 
-{
-  version_configmap: kube.ConfigMap('any-old-app-version') {
-    metadata+: {
-      namespace: 'yebyen-okd4',
-    },
+local config_ns = 'yebyen-okd4';
+
+local flux_config = [
+  kube.ConfigMap('any-old-app-version') {
     data+: {
       VERSION: std.extVar('VERSION'),
     },
   },
-  flux_kustomization: example.kustomization('any-old-app-prod') {
-    metadata+: {
-      namespace: 'yebyen-okd4',
-    },
-    spec+: {
-      path: './flux-config/',
-      postBuild+: {
-        substituteFrom+: [
-          {
-            kind: 'ConfigMap',
-            name: 'any-old-app-version',
-          },
-        ],
-      },
-    },
-  },
-  flux_gitrepository: example.gitrepository('any-old-app-prod') {
-    metadata+: {
-      namespace: 'yebyen-okd4',
-    },
+  example.gitrepository('any-old-app-prod') {
     spec+: {
       url: 'https://github.com/kingdonb/any_old_app',
     },
+  },
+] + kubecfg.parseYaml(importstr 'examples/configMap.yaml');
+
+local kustomization = kustomize.applyList([
+  kustomize.namespace(config_ns),
+]);
+
+local kustomization_output = std.map(kustomization, flux_config);
+
+{ flux_config: kustomization_output } + {
+
+  local items = ['test', 'prod'],
+
+  joined: {
+    [ns + '_flux_kustomization']: {
+      data: example.any_old_app(ns) {
+        spec+: {
+          prune: if ns == 'prod' then false else true,
+        },
+      },
+    }
+    for ns in items
+
+    // Credit:
+    // https://groups.google.com/g/jsonnet/c/ky6sjYj4UZ0/m/d4lZxWbhAAAJ
+    // thanks Dave for showing how to do something like this in Jsonnet
   },
 }

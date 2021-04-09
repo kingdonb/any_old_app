@@ -1,4 +1,4 @@
-// Copyright 2017 The kubecfg authors
+// Copyright 2021 The FluxCD project, 2017 kubecfg authors
 //
 //
 //    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,8 @@
 local kubecfg = import 'kubecfg.libsonnet';
 
 {
+  local this = self,
   kustomization(name):: {
-    local this = self,
     apiVersion: 'kustomize.toolkit.fluxcd.io/v1beta1',
     kind: 'Kustomization',
     metadata: {
@@ -41,6 +41,24 @@ local kubecfg = import 'kubecfg.libsonnet';
           name: 'sops-gpg',
         },
       },
+    },
+  },
+
+  any_old_app(environment):: self.kustomization('any-old-app-' + environment) {
+    metadata+: {
+      namespace: 'yebyen-okd4',
+    },
+    spec+: {
+      path: './flux-config/',
+      postBuild+: {
+        substituteFrom+: [
+          {
+            kind: 'ConfigMap',
+            name: 'any-old-app-version',
+          },
+        ],
+      },
+      targetNamespace: environment + '-yebyen',
     },
   },
 
