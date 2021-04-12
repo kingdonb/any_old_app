@@ -48,7 +48,7 @@ local updateConfig(o) = (
 );
 
 local prod_tenant = [
-  kube.Namespace(prod_ns),
+  //  kube.Namespace(prod_ns),
 ] + pull_secrets + tenant;
 
 local prod_kustomization = kustomize.applyList([
