@@ -1,5 +1,5 @@
-# manifests/examples/tenant.yaml
 ---
+# manifests/examples/tenant.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
