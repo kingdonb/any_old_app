@@ -8,44 +8,6 @@ metadata:
   labels:
     name: any-old-app-version
   name: any-old-app-version
-  namespace: dev
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations: {}
-  labels:
-    name: dev
-  name: dev
----
-apiVersion: v1
-data:
-  VERSION: 0.10.3
-kind: ConfigMap
-metadata:
-  annotations: {}
-  labels:
-    name: any-old-app-version
-  name: any-old-app-version
-  namespace: prod
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  annotations: {}
-  labels:
-    name: prod
-  name: prod
----
-apiVersion: v1
-data:
-  VERSION: 0.10.3-alpha1
-kind: ConfigMap
-metadata:
-  annotations: {}
-  labels:
-    name: any-old-app-version
-  name: any-old-app-version
   namespace: qa
 ---
 apiVersion: v1
@@ -76,6 +38,14 @@ metadata:
   namespace: stg
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  annotations: {}
+  labels:
+    name: uat
+  name: uat
+---
+apiVersion: v1
 data:
   VERSION: 0.10.3-alpha1
 kind: ConfigMap
@@ -91,5 +61,35 @@ kind: Namespace
 metadata:
   annotations: {}
   labels:
-    name: uat
-  name: uat
+    name: dev
+  name: dev
+---
+apiVersion: v1
+data:
+  VERSION: 0.10.3-alpha1
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: dev
+---
+apiVersion: v1
+data:
+  VERSION: 0.10.3
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: prod
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations: {}
+  labels:
+    name: prod
+  name: prod
