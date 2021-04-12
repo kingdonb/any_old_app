@@ -6,7 +6,7 @@ kind: Secret
 metadata:
   creationTimestamp: null
   name: prod-docker-pull-secret
-  namespace: test-yebyen
+  namespace: prod-yebyen
 sops:
   age: []
   azure_kv: []
@@ -48,7 +48,7 @@ metadata:
   labels:
     toolkit.fluxcd.io/tenant: prod
   name: prod
-  namespace: test-yebyen
+  namespace: prod-yebyen
 ---
 apiVersion: v1
 data:
@@ -57,7 +57,7 @@ kind: Secret
 metadata:
   creationTimestamp: null
   name: prod-docker-pull-secret
-  namespace: prod-yebyen
+  namespace: test-yebyen
 sops:
   age: []
   azure_kv: []
@@ -99,4 +99,4 @@ metadata:
   labels:
     toolkit.fluxcd.io/tenant: prod
   name: prod
-  namespace: prod-yebyen
+  namespace: test-yebyen
