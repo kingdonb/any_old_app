@@ -49,7 +49,7 @@ local latest_candidate = '0.10.3-alpha1';
           namespace: ns,
         },
         data+: {
-          VERSION: if ns == 'prod' then release_version else latest_candidate,
+          VERSION: if ns == 'prod' || ns == 'stg' then release_version else latest_candidate,
         },
       },
     },
