@@ -32,41 +32,27 @@ local kustomize = import 'kustomize.libsonnet';
 
 local config_ns = 'yebyen-okd4';
 
-local flux_config = [
-  kube.ConfigMap('any-old-app-version') {
-    data+: {
-      VERSION: std.extVar('VERSION'),
+local release_config = kube.ConfigMap('any-old-app-version');
+local namespace_list = ['prod', 'stg', 'qa', 'uat', 'dev'];
+
+local release_version = '0.10.3';
+local latest_candidate = '0.10.3-alpha1';
+
+{
+  [ns + '_tenant']: {
+    [ns + '_namespace']: {
+      namespace: kube.Namespace(ns),
     },
-  },
-  example.gitrepository('any-old-app-prod') {
-    spec+: {
-      url: 'https://github.com/kingdonb/any_old_app',
-    },
-  },
-] + kubecfg.parseYaml(importstr 'examples/configMap.yaml');
-
-local kustomization = kustomize.applyList([
-  kustomize.namespace(config_ns),
-]);
-
-local kustomization_output = std.map(kustomization, flux_config);
-
-{ flux_config: kustomization_output } + {
-
-  local items = ['test', 'prod'],
-
-  joined: {
-    [ns + '_flux_kustomization']: {
-      data: example.any_old_app(ns) {
-        spec+: {
-          prune: if ns == 'prod' then false else true,
+    [ns + '_configmap']: {
+      version_data: release_config {
+        metadata+: {
+          namespace: ns,
+        },
+        data+: {
+          VERSION: if ns == 'prod' then release_version else latest_candidate,
         },
       },
-    }
-    for ns in items
-
-    // Credit:
-    // https://groups.google.com/g/jsonnet/c/ky6sjYj4UZ0/m/d4lZxWbhAAAJ
-    // thanks Dave for showing how to do something like this in Jsonnet
-  },
+    },
+  }
+  for ns in namespace_list
 }
