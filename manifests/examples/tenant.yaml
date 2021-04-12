@@ -13,7 +13,7 @@ metadata:
     toolkit.fluxcd.io/tenant: prod
   name: prod
   namespace: prod-yebyen
----
+# ---
 # apiVersion: rbac.authorization.k8s.io/v1
 # kind: RoleBinding
 # metadata:
