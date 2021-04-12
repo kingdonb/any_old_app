@@ -1,77 +1,95 @@
 ---
 apiVersion: v1
 data:
-  VERSION: 0.10.2
+  VERSION: 0.10.3-alpha1
 kind: ConfigMap
 metadata:
   annotations: {}
   labels:
     name: any-old-app-version
   name: any-old-app-version
-  namespace: yebyen-okd4
+  namespace: dev
 ---
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: any-old-app-prod
-  namespace: yebyen-okd4
-spec:
-  interval: 20m0s
-  ref:
-    branch: main
-  url: https://github.com/kingdonb/any_old_app
+  annotations: {}
+  labels:
+    name: dev
+  name: dev
 ---
 apiVersion: v1
 data:
-  dataDecryptionSecret: sops-gpg
-  imagePullSecret: docker-pull-secret
+  VERSION: 0.10.3
 kind: ConfigMap
 metadata:
-  name: flux-config
-  namespace: yebyen-okd4
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: prod
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
-kind: Kustomization
+apiVersion: v1
+kind: Namespace
 metadata:
-  name: any-old-app-prod
-  namespace: yebyen-okd4
-spec:
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-gpg
-  interval: 10m0s
-  path: ./flux-config/
-  postBuild:
-    substituteFrom:
-    - kind: ConfigMap
-      name: any-old-app-version
-  prune: false
-  sourceRef:
-    kind: GitRepository
-    name: any-old-app-prod
-  targetNamespace: prod-yebyen
-  validation: client
+  annotations: {}
+  labels:
+    name: prod
+  name: prod
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
-kind: Kustomization
+apiVersion: v1
+data:
+  VERSION: 0.10.3-alpha1
+kind: ConfigMap
 metadata:
-  name: any-old-app-test
-  namespace: yebyen-okd4
-spec:
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-gpg
-  interval: 10m0s
-  path: ./flux-config/
-  postBuild:
-    substituteFrom:
-    - kind: ConfigMap
-      name: any-old-app-version
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: any-old-app-prod
-  targetNamespace: test-yebyen
-  validation: client
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: qa
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations: {}
+  labels:
+    name: qa
+  name: qa
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations: {}
+  labels:
+    name: stg
+  name: stg
+---
+apiVersion: v1
+data:
+  VERSION: 0.10.3-alpha1
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: stg
+---
+apiVersion: v1
+data:
+  VERSION: 0.10.3-alpha1
+kind: ConfigMap
+metadata:
+  annotations: {}
+  labels:
+    name: any-old-app-version
+  name: any-old-app-version
+  namespace: uat
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations: {}
+  labels:
+    name: uat
+  name: uat
