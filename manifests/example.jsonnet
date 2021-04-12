@@ -30,29 +30,37 @@ local example = import 'example.libsonnet';
 local kubecfg = import 'kubecfg.libsonnet';
 local kustomize = import 'kustomize.libsonnet';
 
+local tenant =
+  kubecfg.parseYaml(importstr 'examples/tenant.yaml');
+local pull_secrets =
+  kubecfg.parseYaml(importstr 'examples/sops-image-pull-secret.yaml');
+
 local config_ns = 'yebyen-okd4';
+local prod_ns = 'prod-yebyen';
+local image_pull_secret = 'prod-docker-pull-secret';
 
-local release_config = kube.ConfigMap('any-old-app-version');
-local namespace_list = ['prod', 'stg', 'qa', 'uat', 'dev'];
+// kubecfg doesn't support client-side strategic-merge-patch (yet),
+// but we can do better in jsonnet anyway:
+local updateConfig(o) = (
+  if o.kind == 'ServiceAccount' then o {
+    imagePullSecrets: [{ name: image_pull_secret }],
+  } else o
+);
 
-local release_version = '0.10.3';
-local latest_candidate = '0.10.3-alpha1';
+local prod_tenant = [
+  kube.Namespace(prod_ns),
+] + pull_secrets + tenant;
+
+local prod_kustomization = kustomize.applyList([
+  updateConfig,
+]);
+
+local staging_kustomization = kustomize.applyList([
+  updateConfig,
+  kustomize.namespace('test-yebyen'),
+]);
 
 {
-  [ns + '_tenant']: {
-    [ns + '_namespace']: {
-      namespace: kube.Namespace(ns),
-    },
-    [ns + '_configmap']: {
-      version_data: release_config {
-        metadata+: {
-          namespace: ns,
-        },
-        data+: {
-          VERSION: if ns == 'prod' || ns == 'stg' then release_version else latest_candidate,
-        },
-      },
-    },
-  }
-  for ns in namespace_list
+  prod: std.map(prod_kustomization, prod_tenant),
+  stg: std.map(staging_kustomization, prod_tenant),
 }
