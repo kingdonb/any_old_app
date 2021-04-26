@@ -1,16 +1,21 @@
+version = ''
+buildDate = ''
+targetBranch = ''
+
 pipeline {
   agent any
   stages {
     stage('Prepare') {
       steps {
         sh('''
-            git checkout -B $TARGET_BRANCH
+            git checkout -B \\${GIT_BRANCH#*/}
             git config user.name 'jenkins-ci-user'
             git config user.email 'kingdonb@users.noreply.github.example.com'
         ''')
         script {
           version = env.GIT_COMMIT.substring(0,8)
           buildDate = sh(script: "date -u +'%Y-%m-%dT%H:%M:%SZ'")
+          targetBranch = sh(script: 'echo ${GIT_BRANCH#*/}')
         }
       }
     }
@@ -27,7 +32,7 @@ pipeline {
         sh('''
             git add . && git commit -am "[Jenkins CI] update-k8s.sh"
             git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USR; echo password=\\$GIT_AUTH_PSW; }; f"
-            git push origin HEAD:$TARGET_BRANCH
+            git push origin HEAD:${targetBranch}
         ''')
       }
     }
