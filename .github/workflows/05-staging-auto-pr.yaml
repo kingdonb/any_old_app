@@ -16,6 +16,7 @@ jobs:
         uses: peter-evans/create-pull-request@v3
         with:
           signoff: true
+          branch: staging
           base: main
           commit-message: '[ci skip] Auto-PR from Staging'
           draft: true
