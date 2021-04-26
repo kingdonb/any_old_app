@@ -29,13 +29,9 @@ pipeline {
         GIT_AUTH = credentials('jenkins-git-writer-token-auth')
       }
       steps {
-        sh('''
-            git add . && git commit -am "[Jenkins CI] update-k8s.sh"
-            git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USR; echo password=\\$GIT_AUTH_PSW; }; f"
-        ''')
-        sh("""
-            git push origin HEAD:${targetBranch}
-        """)
+        sh("git add . && git commit -am '[Jenkins CI] update-k8s.sh for ${version}'")
+        sh('git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USR; echo password=\\$GIT_AUTH_PSW; }; f')
+        sh("git push origin HEAD:${targetBranch}")
       }
     }
   }
