@@ -14,6 +14,9 @@ jobs:
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3
-        signoff: true
-        base: main
+        with:
+          signoff: true
+          base: main
+          commit-message: '[ci skip] Auto-PR from Staging'
+          draft: true
 
