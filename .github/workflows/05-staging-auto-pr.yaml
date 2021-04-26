@@ -1,0 +1,19 @@
+# ./.github/workflows/05-staging-auto-pr.yaml
+name: Staging Auto-PR
+on:
+  push:
+    branches: ['staging']
+
+jobs:
+  run:
+    name: Open PR to main
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        signoff: true
+        base: main
+
