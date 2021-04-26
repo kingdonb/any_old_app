@@ -15,7 +15,7 @@ pipeline {
         script {
           version = env.GIT_COMMIT.substring(0,8)
           buildDate = sh(script: "date -u +'%Y-%m-%dT%H:%M:%SZ'")
-          targetBranch = sh(script: 'echo ${GIT_BRANCH#*/}')
+          targetBranch = env.GIT_BRANCH
         }
       }
     }
@@ -32,8 +32,10 @@ pipeline {
         sh('''
             git add . && git commit -am "[Jenkins CI] update-k8s.sh"
             git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USR; echo password=\\$GIT_AUTH_PSW; }; f"
-            git push origin HEAD:${targetBranch}
         ''')
+        sh("""
+            git push origin HEAD:${targetBranch}
+        """)
       }
     }
   }
