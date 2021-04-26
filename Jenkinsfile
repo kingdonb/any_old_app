@@ -8,7 +8,7 @@ pipeline {
     stage('Prepare') {
       steps {
         sh('''
-            git checkout -B \\${GIT_BRANCH#*/}
+            git checkout -B \${GIT_BRANCH#*/}
             git config user.name 'jenkins-ci-user'
             git config user.email 'kingdonb@users.noreply.github.example.com'
         ''')
