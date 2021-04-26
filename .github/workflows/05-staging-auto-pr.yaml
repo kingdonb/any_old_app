@@ -5,19 +5,20 @@ on:
     branches: ['staging']
 
 jobs:
-  run:
+  pull-request:
     name: Open PR to main
     runs-on: ubuntu-latest
     steps:
-      - name: checkout
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v2
+      name: checkout
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
-        with:
-          signoff: true
-          branch: staging
-          base: main
-          commit-message: '[ci skip] Auto-PR from Staging'
-          draft: true
+    - uses: repo-sync/pull-request@v2
+      name: pull-request
+      with:
+        destination_branch: "main"
+        pr_title: "Pulling ${{ github.ref }} into main"
+        pr_body: ":crown: *An automated PR*"
+        pr_reviewer: "kingdonb"
+        pr_draft: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
