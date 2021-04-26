@@ -8,7 +8,7 @@ pipeline {
     stage('Prepare') {
       steps {
         sh('''
-            git checkout -B \${GIT_BRANCH#*/}
+            git checkout -B \${GIT_BRANCH}
             git config user.name 'jenkins-ci-user'
             git config user.email 'kingdonb@users.noreply.github.example.com'
         ''')
@@ -30,7 +30,7 @@ pipeline {
       }
       steps {
         sh("git add . && git commit -am '[Jenkins CI] update-k8s.sh for ${version}'")
-        sh('git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USR; echo password=\\$GIT_AUTH_PSW; }; f')
+        sh('git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USR; echo password=\\$GIT_AUTH_PSW; }; f"')
         sh("git push origin HEAD:${targetBranch}")
       }
     }
