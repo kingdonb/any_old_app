@@ -33,7 +33,7 @@ jobs:
         run: ./ci/rake.sh deploy
 
       - name: Commit changes
-        uses: EndBug/add-and-commit@v7
+        uses: EndBug/add-and-commit@v9
         with:
           add: 'production.yaml'
           branch: deploy
