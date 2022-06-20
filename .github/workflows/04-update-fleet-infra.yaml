@@ -21,7 +21,7 @@ jobs:
           echo ::set-output name=VERSION::${VERSION}
 
       - name: Checkout repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Update manifests
         run: ./update-k8s.sh $GITHUB_SHA
