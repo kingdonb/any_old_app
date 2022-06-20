@@ -13,7 +13,7 @@ spec:
         app: any-old-app
     spec:
       containers:
-      - image: kingdonb/any-old-app:b80f396d
+      - image: kingdonb/any-old-app:e4a9baae
         name: any-old-app
 
 ---
