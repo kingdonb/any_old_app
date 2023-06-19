@@ -2,7 +2,7 @@
   "name": "any-old-app",
   "private": true,
   "dependencies": {
-    "@rails/ujs": "6.0.5"
+    "@rails/ujs": "6.1.7"
   },
   "version": "0.1.0"
 }
